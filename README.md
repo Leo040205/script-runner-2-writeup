@@ -176,7 +176,7 @@ os.system("cat /root/flag.txt")
 
 Upload this script as `base64.py` and upload `sus.py` after that and then we got the flag!
 
-![noroot](.\img\noroot.png)
+![noroot](img/noroot.png)
 
 
 
@@ -271,7 +271,7 @@ except Exception as e:
 
 This script overwrites `utils.py` to read the flag every time when it is called to execute a script and returns the output. Now, all there is left to do is to upload this as `base64.py` and then upload `sus.py` **twice** (first time to overwrite `utils.py`, second time to get the flag)
 
-![flag](.\img\flag.png)
+![flag](img/flag.png)
 
 
 
@@ -288,3 +288,4 @@ TUDCTF{tH@T$_4_pReT7Y_SU$sy_MODul3}
 Unfortunately I was a bit ill during the competition and did not manage to solve it during the CTF. Moreover, there were several occasions where I just wanted to get the solution, but I'm glad I was able to solve it myself. Surprisingly enough, this challenge with only 4 solves was solvable **with a chatbot**, as a friend of mine in a different team solved this challenge (and many others) with **Claude** 
 
 **¯\\\_(ツ)\_/¯**
+
