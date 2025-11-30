@@ -35,7 +35,7 @@ def upload():
     return render_template('index.html', output=output)
 ```
 
-The idea behind is simple, you upload a file and the server will run it. But there is a catch... Only files that generate one of the three hashes stored in `hashes.txt` are allowed
+The idea behind it is simple, you upload a file and the server will run it. But there is a catch... Only files that generate one of the three hashes stored in `hashes.txt` are allowed
 
 ```
 e58831678a67fd86491cf7d9b79bb13d339f4d78882ad769f6d00b81c8243a46
@@ -54,7 +54,7 @@ def get_secure_hash(path):
     return secure_hash
 ```
 
-Writing a script that reads the flag with [hash collision](https://en.wikipedia.org/wiki/Hash_collision) is computationally impossible as of writing, because it runs a [Key Derivation Function](https://en.wikipedia.org/wiki/Key_derivation_function) designed against brute-force attacks 256 rounds. What makes the server so secure against brute-force attacks made it vulnerable to [TOCTOU](https://en.wikipedia.org/wiki/Time-of-check_to_time-of-use) attacks, KDF is so good against brute-force attacks because it is computationally heavy (i.e. it takes a long time to calculate it). Thus, if we overwrite the content of the original file while the server is calculating and checking the hash, we will be able to run any script we want.
+Writing a script that reads the flag with [hash collision](https://en.wikipedia.org/wiki/Hash_collision) is computationally impossible as of writing, because it runs a [Key Derivation Function](https://en.wikipedia.org/wiki/Key_derivation_function) designed against brute-force attacks for 256 rounds. However, what makes the server so secure against brute-force attacks made it vulnerable to [TOCTOU](https://en.wikipedia.org/wiki/Time-of-check_to_time-of-use) attacks, KDF is so effective against brute-force attacks because it is computationally heavy (i.e. it takes a long time to calculate it). Thus, if we overwrite the content of the original file while the server is calculating and checking the hash, we will be able to run any script we want.
 
 ### Solve script by the author of Script Runner (martin)
 
@@ -73,7 +73,7 @@ curl -F "file=@$payload;filename=a.sh" "$host/upload"
 
 ## Back to Script Runner 2
 
-Now, what has changed in **Script Runner 2** compared to its prequel
+Now, what has changed in **Script Runner 2** compared to its prequel?
 
 ### TL;DR
 
@@ -82,7 +82,7 @@ Now, what has changed in **Script Runner 2** compared to its prequel
 <p>- Fix security</p>
 ```
 
-Jokes aside, here is what actually changed
+Jokes aside, here is what actually changed:
 
 ```python
 from threading import Lock
@@ -109,7 +109,7 @@ def upload():
     return render_template('index.html', output=output)
 ```
 
-They have added a lock which prevents the previous [race condition](https://en.wikipedia.org/wiki/Race_condition) vulnerability, other than that, nothing much has changed. Heck, they didn't even bother adding a line to delete the uploads after running it!
+They added a lock which prevents the previous [race condition](https://en.wikipedia.org/wiki/Race_condition) vulnerability. Other than that, nothing much has changed. Heck, they didn't even bother adding a line to delete the uploads after running it!
 
 Now, you might wonder: "If not much has changed, why did they change the category from web to misc?"
 
@@ -128,7 +128,7 @@ b = base64.b64decode(SECRET).decode('utf-8')
 print(b)
 ```
 
-A simple Python script that decrypts a Base64 encoded message (decryption is left as an exercise for the reader)
+This is a simple Python script that decrypts a Base64 encoded message (decryption is left as an exercise for the reader)
 
 
 
@@ -161,11 +161,11 @@ RUN chown user /home/user/uploads/
 CMD ["python", "app.py"]
 ```
 
-The flag is copied to `/root/flag.txt`, now that we have a [RCE](https://www.cloudflare.com/learning/security/what-is-remote-code-execution/) exploit and know the location of the flag, we can write our solve script to get the flag
+In this file we can see that the flag was copied to `/root/flag.txt`. Now that we have found  both a [RCE](https://www.cloudflare.com/learning/security/what-is-remote-code-execution/) exploit and the location of the flag, we can write a payload script to get the flag
 
 
 
-## Solve Script
+## Payload Script
 
 ```python
 #!/usr/bin/env python
@@ -174,7 +174,7 @@ import os
 os.system("cat /root/flag.txt")
 ```
 
-Upload this script as `base64.py` and upload `sus.py` after that and then we got the flag!
+If we upload this script as `base64.py` and upload the whitelisted `sus.py` after that, we should get the flag!
 
 ![noroot](img/noroot.png)
 
@@ -203,9 +203,9 @@ def execute_script(path):
     return output
 ```
 
-Before each script is being run in a child process, the parent process removes its root privileges leading to us not being able to read `/root/flag.txt`
+It turns out that before a script is executed in a child process, the parent process removes its root privileges leading to insufficient permissions to read `/root/flag.txt`
 
-Of course, there is no point in separating root and user privileges if any user can just become root as they wish. Finding this makes it seemed like a dead end, but it is actually a big hint. Because, the fact that all of these security measurements are needed means that the parent has root privileges!
+Of course, there is no point in separating root and user privileges if any user can just become root at will. Finding this makes it seemed like a dead end, but it is actually a big hint. Because, the fact that all of these security measures are needed means that the parent has root privileges!
 
 ### Dockerfile (again)
 
@@ -215,11 +215,11 @@ RUN mkdir /home/user/uploads/
 RUN chown user /home/user/uploads/
 ```
 
-Looking at the **Dockerfile** again we can see that `/home/user/` is owned by the user, this means that we can modify both `app.py` and `utils.py` (which are being executed as root)
+Looking at the `Dockerfile` again we can see that `/home/user/` is owned by the user, this means that we can modify both `app.py` and `utils.py` (which are being executed as root)
 
 
 
-## Solve Script (this time for real I promise)
+## Payload Script (this time for real I promise)
 
 ```python
 #!/usr/bin/env python
